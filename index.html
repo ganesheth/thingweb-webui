@@ -172,8 +172,10 @@
                 </ul>
             </section>
             <br/>
-
-            <section class="md-whiteframe-2dp"  flex>
+			
+            
+							
+            <section class="md-whiteframe-2dp">
                 <md-toolbar class="md-primary">
                     <div class="md-toolbar-tools">
                         <h2>Properties</h2>
@@ -186,59 +188,19 @@
                 </md-toolbar>
                 <ul ng-repeat="property in tcc.selected.properties">
                     <li>{{property.name}}:
-                        <md-input-container ng-show="property.type === 'string'" name="myForm">
-                            <label>{{property.type }}</label>
-                            <input type="text" name="myField" ng-model="property.value" ng-readonly="!property.writable" />
-                            <div ng-messages="myForm.myField.$error" role="alert">
-                                
-                                <div ng-message="type">This field must be a valid type.</div>
-                                
-                          </div>
-                        </md-input-container>
-
-                        <md-input-container ng-show="property.type=='number' ||property.type=='integer'" name="myForm">
-                            <label>{{property.type}}</label>
-                            <input type="number" name="myField" ng-model="property.value" ng-readonly="!property.writable" />
-                            <div ng-messages="myForm.myField.$error" role="alert">
-                                
-                                <div ng-message="type">This field must be a valid type.</div>
-                                
-                          </div>
-                        </md-input-container>
- 
-           
-       
-                     <ul ng-show="property.type=='object'" ng-repeat="(key, val) in property.properties track by $index">
-                        <li >
-                         <span>{{key}}</span>
-                            <md-input-container  name="myForm">
-                            <label ">{{val.type }} {{tcc.minMax(val.minimum,val.maximum)}}</label>
-                           
-                           
-                           <input  type ="{{tcc.setType(val.type)}}"  name ="myField" min="{{val.minimum}}" max="{{val.maximum}}" ng-model="property.value[key]" ng-readonly="!property.writable" required/>
-                           <div ng-messages="myForm.myField.$error" role="alert">
-                                <div ng-message="required">Please enter a value for this field.</div>
-                                <div ng-message="type">This field must be a valid type.</div>
-                                <div ng-message="max">This field can not exceed the max value </div>
-                                <div ng-message="min">This field can not exceed the min value </div>
-                          </div>
-                            </md-input-container>
- 
-                                
-                            
-                        </li>
-                    </ul>
-                        <md-checkbox type="checkbox" ng-model="property.value" ng-readonly="!property.writable" ng-show="property.type === 'boolean'">
-
-                        </md-checkbox>
-                        <md-button class="md-raised" ng-click="tcc.toggleAuto(property)">auto-</md-button>
-                        <md-button class="md-raised" ng-click="tcc.readProperty(property)" ng-disabled="property.autoUpdate">update</md-button>
-                        <md-button class="md-raised" ng-click="tcc.writeProperty(property)" ng-show="property.writable">set</md-button>
-
-                        <div ng-show="property.autoUpdate" class="md-whiteframe-2dp" layout flex="50">
+                        <md-button class="md-raised" ng-click="tcc.toggleAuto(property)">poll..</md-button>
+                        <md-button class="md-raised" ng-click="tcc.readProperty(property)" ng-disabled="property.autoUpdate">read</md-button>
+                        <md-button class="md-raised" ng-click="tcc.toggleForm(property)" ng-show="property.writable">write..</md-button>
+						
+						<b>{{property.value}}</b> <sup ng-show="property.value">{{property.unit}}  </sup> Model: {{property.model}}) Schema: {{property.schema}}
+                        
+						<div ng-show="property.autoUpdate" class="md-whiteframe-2dp" layout flex="50">
                             <chart value="property.history" type="Bar" height="120" width="360" />
                         </div>
 
+						<div ng-show="property.showForm" class="md-whiteframe-2dp" layout flex="50">
+							<form name="thisForm" ng-if="property.writable" sf-schema="property.schema" sf-form="form" sf-model="property.model" ng-submit="onSubmit(thisForm, property)" style="padding: 25px 25px 25px 25px;"></form>
+                        </div>		
                     </li>
                 </ul>
             </section>
@@ -255,6 +217,11 @@
     <script src="bower_components/angular-material/angular-material.js"></script>
     <script src="bower_components/angular-coap/angular-coap.js"></script>
     <script src="bower_components/angular-wot/dist/angular-wot.js"></script>
+    <script type="text/javascript" src="bower_components/angular-sanitize/angular-sanitize.min.js"></script>
+    <script type="text/javascript" src="bower_components/tv4/tv4.js"></script>
+    <script type="text/javascript" src="bower_components/objectpath/lib/ObjectPath.js"></script>
+    <script type="text/javascript" src="bower_components/angular-schema-form/dist/schema-form.js"></script>
+    <script type="text/javascript" src="bower_components/angular-schema-form/dist/bootstrap-decorator.min.js"></script>
     <!-- endbuild -->
 
     <!-- build:js assets/js/app.min.js -->

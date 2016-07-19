@@ -1,4 +1,4 @@
-angular.module("thingclient").controller('ThingClientCtrl',
+app.controller('ThingClientCtrl',
     ['$scope', '$interval', '$http' , '$mdSidenav', '$mdDialog', '$mdToast', 'TdParser', 'ThingClient',
         function ThingClientCtrl($scope, $interval, $http ,$mdSidenav, $mdDialog, $mdToast, TdParser, ThingClient) {
             var self = this;
@@ -117,6 +117,10 @@ angular.module("thingclient").controller('ThingClientCtrl',
                         self.autoReloaded.splice(idx, 1); //remove property
                 }
             }
+			
+			self.toggleForm = function toggleForm(property) {
+                property.showForm = !property.showForm;
+            }
             
             self.addCatalog = function addCatalog($event) {
                 $mdDialog.show({
@@ -146,8 +150,56 @@ angular.module("thingclient").controller('ThingClientCtrl',
                     targetEvent: $event
                 });
             }
+			
+			$scope.form = [
+			  "*",
+			  {
+				"type":"submit",
+				"title":"Update"
+			  }
+			];
+			
+			$scope.model = {"value":25}
+			
+			$scope.schema = {"type":"object","title":"Numeric value","properties":{"value":{"title":"Value","type":"number"},"index":{"title":"Index","type":"integer","minimum":0},"priority":{"title":"Prio.","type":"integer","minimum":0,"maximum":16}},"oneOf":[{"required":["value"]},{"required":["priority"]}]}
+
+			$scope.onSubmit = function (form, interaction) {
+				$scope.$broadcast('schemaFormValidate');
+				if (form.$valid) {
+					interaction.value = interaction.model.value;
+					self.writeProperty(interaction);
+					console.log(interaction.model);
+				}
+			}
 
             return self;
         }
     ]
 );
+
+app.service('WoTService', ['$http', '$q', function($http, $q){
+
+	this.readJsonData = function readJsonData(url, tag, callback) {
+		$http.get(url).then( function (res) {
+			callback(res.data, tag);
+		});
+	}
+
+	this.putJsonData = function putJsonData(url, value, tag, callback) {
+	    $http.put(url, value).then(function (res) {
+	        callback(res, tag);
+	    });
+	}
+
+	this.postJsonData = function postJsonData(url, value, tag, callback) {
+	    $http.post(url, value).then(function (res) {
+	        callback(res, tag);
+	    });
+	}
+
+	this.deleteResource = function deleteResource(url, tag, callback) {
+	    $http.delete(url).then(function (res) {
+	        callback(res, tag);
+	    });
+	}
+}]);

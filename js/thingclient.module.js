@@ -1,5 +1,5 @@
-angular
-    .module('thingclient', ['ngMaterial', 'chartjs-directive', 'file-loader', 'wot'])
+var app = angular
+    .module('thingclient', ['ngMaterial', 'chartjs-directive', 'file-loader', 'wot', 'schemaForm'])
     .config(['$mdThemingProvider',
         function($mdThemingProvider) {
             $mdThemingProvider.theme('default')
