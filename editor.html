@@ -1,0 +1,23 @@
+<md-dialog flex="90" style="height : 90%">
+    <md-toolbar>
+        <div class="md-toolbar-tools">New Script
+                 <span flex></span>
+                    <md-button ng-click="dialog.fixEditor()" aria-label="fix script editor">I see no editor</md-button>
+                    </div>
+    </md-toolbar>
+    <md-dialog-content flex="noshrink" layout="row" layout-padding>
+
+        <div id="container" flex="90" ></div>
+        
+        <!-- div script-editor></div-->
+
+    </md-dialog-content>
+    <md-dialog-actions layout="row">
+        <md-button aria-label="Close dialog" ng-click="dialog.close()" class="md-primary">
+            Close
+        </md-button>
+        <md-button aria-label="Submit dialog" ng-click="dialog.submit()" class="md-primary">
+            Save script
+        </md-button>
+    </md-dialog-actions>
+</md-dialog>

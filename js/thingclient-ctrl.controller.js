@@ -1,14 +1,25 @@
+<<<<<<< HEAD
+angular.module("thingclient").controller('ThingClientCtrl',
+    ['$scope', '$interval', '$http' , '$mdSidenav', '$mdDialog', '$mdToast', '$window', 'TdParser', 'ThingClient',
+        function ThingClientCtrl($scope, $interval, $http ,$mdSidenav, $mdDialog, $mdToast, $window, TdParser, ThingClient) {
+=======
 app.controller('ThingClientCtrl',
     ['$scope', '$interval', '$http' , '$mdSidenav', '$mdDialog', '$mdToast', 'TdParser', 'ThingClient',
         function ThingClientCtrl($scope, $interval, $http ,$mdSidenav, $mdDialog, $mdToast, TdParser, ThingClient) {
+>>>>>>> f11e7d2e4532f5b35e994691a2da384f6b37f570
             var self = this;
             $scope.things = [];
             self.selected = {};
             self.autoReloaded = [];
             
             var showRestError = function showRestError(errorObj) {
-                msg = errorObj.config.method + " to " + errorObj.config.url + " failed.<br/>";
-                msg += errorObj.status + " " + errorObj.statusText
+                if(errorObj.config) {
+                    msg = errorObj.config.method + " to " + errorObj.config.url + " failed.<br/>";
+                    msg += errorObj.status + " " + errorObj.statusText
+                } else {
+                    msg = JSON.stringify(errorObj);
+                }
+                
                 showError(msg);
             }
 
@@ -34,7 +45,9 @@ app.controller('ThingClientCtrl',
                 else if (type== "string") {
                     return "text";
                 }
-
+                else if (type== "boolean") {
+                    return "checkbox";
+                }
             }
 
             $interval(reloadAuto, 1000);
@@ -63,6 +76,7 @@ app.controller('ThingClientCtrl',
             }
 
             self.readProperty = function readProperty(property) {
+                property.type = "string";
                 ThingClient.readProperty(self.selected, property).catch(showRestError);
             }
 
@@ -101,6 +115,36 @@ app.controller('ThingClientCtrl',
                     templateUrl: 'uridialog.html',
                     targetEvent: $event
                 });
+            }
+
+            self.openEditor = function openEditor($event, action) {
+                $mdDialog.show({
+                    clickOutsideToClose: true,
+                    controller: function($mdDialog) {
+
+                        this.fixEditor = function() {
+                            loadWoTEditor();    
+                        }
+
+                        loadWoTEditor();
+
+                        // Setup some handlers
+                        this.close = function() {
+                            $mdDialog.cancel();
+                        };
+                        
+                        this.submit = function() {
+                            $mdDialog.hide();
+                            var js = window.woteditor.getValue();
+                            $scope.param = js;
+                            console.log("sending: \n " + js);
+                        };
+                    },
+                    controllerAs: 'dialog',
+                    templateUrl: 'editor.html',
+                    targetEvent: $event
+                });
+                
             }
 
             self.addFileFromPicker = function addFileFromPicker(filePickerId) {

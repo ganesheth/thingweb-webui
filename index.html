@@ -8,14 +8,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="description" content="">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
-    
+
     <!-- build:css assets/css/vendor.min.css -->
     <link rel="stylesheet" href="bower_components/angular-material/angular-material.css">
     <!-- endbuild -->
-    
+
     <link rel='stylesheet' href='http://fonts.googleapis.com/css?family=Roboto:400,500,700,400italic'>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-   
+
     <style type="text/css">
         /**
          * Hide when Angular is not yet loaded and initialized
@@ -35,13 +35,9 @@
 
 <body ng-app="thingclient" layout="row" ng-controller="ThingClientCtrl as tcc" ng-cloak>
 
-    <md-sidenav 
-        class="site-sidenav md-sidenav-left md-whiteframe-z2"
-        md-component-id="left" 
-        ng-click="tcc.toggleList()" 
-        aria-label="Show Things List"
-        md-is-locked-open="$mdMedia('gt-sm')" 
-        flex>
+    
+    <md-sidenav class="site-sidenav md-sidenav-left md-whiteframe-z2" md-component-id="left" ng-click="tcc.toggleList()" aria-label="Show Things List"
+        md-is-locked-open="$mdMedia('gt-sm')" flex>
 
         <md-toolbar layout="row" class="md-whiteframe-z1">
             <h3>Things</h3>
@@ -57,7 +53,7 @@
         </md-list>
 
         <md-fab-speed-dial md-open="isOpen" md-direction="right" class="md-scale" md-hover-full="true" ng-mouseenter="isOpen=true"
-        ng-mouseleave="isOpen=false">
+            ng-mouseleave="isOpen=false">
             <md-fab-trigger>
                 <md-button aria-label="Add Thing" class="md-fab md-primary">
                     <md-icon>add</md-icon>
@@ -73,7 +69,7 @@
                     <md-icon>attachment</md-icon>
                     <md-tooltip>add from file</md-tooltip>
                 </md-button>
-                 <md-button aria-label="add from repo" class="md-fab md-raised md-mini" ng-click="tcc.addCatalog($event)">
+                <md-button aria-label="add from repo" class="md-fab md-raised md-mini" ng-click="tcc.addCatalog($event)">
                     <md-icon>local_library</md-icon>
                     <md-tooltip>add from repo</md-tooltip>
                 </md-button>
@@ -88,23 +84,20 @@
 
     <div layout="column" tabIndex="-1" role="main" class="md-whiteframe-z2" flex>
         <md-toolbar layout="row" class="md-whiteframe-z1">
-            <md-button id="main" class="menu" hide-gt-sm ng-click="tcc.toggleList()" aria-label="Show User List">
+            <md-button id="main" class="menu" hide-gt-sm ng-click="tcc.toggleList()" aria-label="Show Things List">
                 <md-icon>menu</md-icon>
             </md-button>
-            <h3>Web of Things Client
-        <span ng-show="tcc.selected.name">
-          : {{tcc.selected.name}}
-        </span>
-      </h3>
+            <h3>
+                Web of Things Client
+                <span ng-show="tcc.selected.name">: {{tcc.selected.name}}</span>
+            </h3>
             <span flex></span>
-            <!-- md-button aria-label="More" class="menu" hide-gt-sm>
-        <md-icon>more_vert</md-icon>
-    </md-button-->
+                    <md-button ng-click="tcc.openEditor()">Script editor</md-button>
         </md-toolbar>
-
+        
         <md-content id="content" ng-show="tcc.selected.name" layout-margin layout="column">
 
-            <section class="md-whiteframe-2dp" >
+            <section class="md-whiteframe-2dp">
                 <md-toolbar class="md-primary">
                     <div class="md-toolbar-tools">
                         <h2>{{tcc.selected.name}}</h2>
@@ -115,7 +108,7 @@
             <br/>
 
             <!-- actions and properties -->
-            <section class="md-whiteframe-2dp" >
+            <section class="md-whiteframe-2dp">
                 <md-toolbar class="md-primary">
                     <div class="md-toolbar-tools">
                         <h2>Actions</h2>
@@ -127,67 +120,115 @@
                             <label>Parameter ({{action.xsdParamType}})</label>
                             <input type="text" name="myField" ng-model="param" />
                             <div ng-messages="myForm.myField.$error" role="alert">
-                                
                                 <div ng-message="type">This field must be a valid type.</div>
-                               
-                          </div>
-                        </md-input-container>
-                        
-                       <md-input-container  name ="myForm" ng-show="action.xsdParamType=='number'||action.xsdParamType=='integer' ">
-                            <label>Parameter ({{action.xsdParamType}})</label>
-                            <input type="number" name ="myField" ng-model="param" />
-                            <div ng-messages="myForm.myField.$error" role="alert">
-                                
-                                <div ng-message="type">This field must be a valid type.</div>
-                                
-                          </div>
+                            </div>
                         </md-input-container>
 
-                    <ul ng-show="action.xsdParamType=='object'" ng-repeat="(key, val) in action.inputProperties track by $index">
-                        <li >
-                         <span>{{key}}</span>
-                            <md-input-container  name="myForm">
-                            <label ">{{val.type }} {{tcc.minMax(val.minimum,val.maximum)}}</label>
-                           
-                           
-                           <input  type ="{{tcc.setType(val.type)}}"  name ="myField" min="{{val.minimum}}" max="{{val.maximum}}" ng-model="param[key]"  required/>
-                           <div ng-messages="myForm.myField.$error" role="alert">
-                                <div ng-message="required">Please enter a value for this field.</div>
+                        <md-input-container name="myForm" ng-show="action.xsdParamType== 'javascript' ">
+                            <md-button class="md-raised md-primary" ng-click="tcc.openEditor($event, action)">Script-Editor
+                                <md-tooltip>click to specify/modify script</md-tooltip>
+                            </md-button>
+                        </md-input-container>
+
+                        <md-input-container name="myForm" ng-show="action.xsdParamType=='number'||action.xsdParamType=='integer' ">
+                            <label>Parameter ({{action.xsdParamType}})</label>
+                            <input type="number" name="myField" ng-model="param" />
+                            <div ng-messages="myForm.myField.$error" role="alert">
                                 <div ng-message="type">This field must be a valid type.</div>
-                                <div ng-message="max">This field can not exceed the max value </div>
-                                <div ng-message="min">This field can not exceed the min value </div>
-                          </div>
-                            </md-input-container>
- 
-                                
-                            
-                        </li>
-                    </ul>
-                        
+                            </div>
+                        </md-input-container>
+
+                        <ul ng-show="action.xsdParamType=='object'" ng-repeat="(key, val) in action.inputProperties track by $index">
+                            <li>
+                                <span>{{key}}</span>
+                                <md-input-container name="myForm">
+                                    <label>{{val.type }} {{tcc.minMax(val.minimum,val.maximum)}}</label>
+                                    <input type="{{tcc.setType(val.type)}}" name="myField" min="{{val.minimum}}" max="{{val.maximum}}" ng-model="param[key]"
+                                        required/>
+                                    <div ng-messages="myForm.myField.$error" role="alert">
+                                        <div ng-message="required">Please enter a value for this field.</div>
+                                        <div ng-message="type">This field must be a valid type.</div>
+                                        <div ng-message="max">This field can not exceed the max value </div>
+                                        <div ng-message="min">This field can not exceed the min value </div>
+                                    </div>
+                                </md-input-container>
+                            </li>
+                        </ul>
+
                         <md-checkbox ng-show="action.xsdParamType === 'boolean'" ng-model="param">
 
                         </md-checkbox>
-                        <md-button class="md-raised" ng-click="tcc.callAction(action, param)">call</md-button>
+                        <md-button class="md-raised" ng-click="tcc.callAction(action, param)" aria-label="Execute action">
+                            <md-tooltip>execute action</md-tooltip>
+                            call</md-button>
                     </li>
                 </ul>
             </section>
             <br/>
+<<<<<<< HEAD
+
+            <section class="md-whiteframe-2dp" flex>
+=======
 			
             
 							
             <section class="md-whiteframe-2dp">
+>>>>>>> f11e7d2e4532f5b35e994691a2da384f6b37f570
                 <md-toolbar class="md-primary">
                     <div class="md-toolbar-tools">
                         <h2>Properties</h2>
                         <span flex></span>
                         <md-button class="md-icon-button" aria-label="update state" ng-click="tcc.updateState()">
                             <md-icon>autorenew</md-icon>
-                            <md-too!ltip>update all</md-tooltip>
+                            <md-tooltip>update all</md-tooltip>
                         </md-button>
                     </div>
                 </md-toolbar>
                 <ul ng-repeat="property in tcc.selected.properties">
                     <li>{{property.name}}:
+<<<<<<< HEAD
+                        <md-input-container ng-show="property.type === 'string'" name="myForm">
+                            <label>{{property.type }}{{tcc.minMax(val.minimum,val.maximum)}}</label>
+                            <input type="text" name="myField" ng-model="property.value" ng-readonly="!property.writable" />
+                            <div ng-messages="myForm.myField.$error" role="alert">
+                                <div ng-message="type">This field must be a valid type.</div>
+                            </div>
+                        </md-input-container>
+
+                        <md-input-container ng-show="property.type=='number' || property.type=='integer'" name="myForm">
+                            <label>{{property.type}}</label>
+                            <input type="number" name="myField" ng-model="property.value" ng-readonly="!property.writable" />
+                            <div ng-messages="myForm.myField.$error" role="alert">
+                                <div ng-message="type">This field must be a valid type.</div>
+                            </div>
+                        </md-input-container>
+
+                        <ul ng-show="property.type=='object'" ng-repeat="(key, val) in property.properties track by $index">
+                            <li>
+                                <span>{{key}}</span>
+                                <md-input-container name="myForm">
+                                    <label>{{val.type }} {{tcc.minMax(val.minimum,val.maximum)}}</label>
+
+                                    <input type="{{tcc.setType(val.type)}}" name="myField" min="{{val.minimum}}" max="{{val.maximum}}" ng-model="property.value[key]"
+                                        ng-readonly="!property.writable" required/>
+                                    <div ng-messages="myForm.myField.$error" role="alert">
+                                        <div ng-message="required">Please enter a value for this field.</div>
+                                        <div ng-message="type">This field must be a valid type.</div>
+                                        <div ng-message="max">This field can not exceed the max value </div>
+                                        <div ng-message="min">This field can not exceed the min value </div>
+                                    </div>
+                                </md-input-container>
+                            </li>
+                        </ul>
+                        <md-checkbox type="checkbox" ng-model="property.value" ng-readonly="!property.writable" ng-show="property.type === 'boolean'" aria-label="Your Field Lable name">
+
+                        </md-checkbox>
+                        <md-button class="md-raised" ng-click="tcc.toggleAuto(property)">auto-</md-button>
+                        <md-button class="md-raised" ng-click="tcc.readProperty(property)" ng-disabled="property.autoUpdate">update</md-button>
+                        <md-button class="md-raised" ng-click="tcc.writeProperty(property)" ng-show="property.writable">set</md-button>
+
+                        <div ng-show="property.autoUpdate" class="md-whiteframe-2dp" layout flex="50">
+=======
                         <md-button class="md-raised" ng-click="tcc.toggleAuto(property)">poll..</md-button>
                         <md-button class="md-raised" ng-click="tcc.readProperty(property)" ng-disabled="property.autoUpdate">read</md-button>
                         <md-button class="md-raised" ng-click="tcc.toggleForm(property)" ng-show="property.writable">write..</md-button>
@@ -195,6 +236,7 @@
 						<b>{{property.value}}</b> <sup ng-show="property.value">{{property.unit}}  </sup> Model: {{property.model}}) Schema: {{property.schema}}
                         
 						<div ng-show="property.autoUpdate" class="md-whiteframe-2dp" layout flex="50">
+>>>>>>> f11e7d2e4532f5b35e994691a2da384f6b37f570
                             <chart value="property.history" type="Bar" height="120" width="360" />
                         </div>
 
@@ -210,6 +252,7 @@
     </div>
 
     <!-- build:js assets/js/vendor.min.js -->
+    
     <script src="bower_components/angular/angular.js"></script>
     <script src="bower_components/angular-animate/angular-animate.js"></script>
     <script src="bower_components/angular-aria/angular-aria.js"></script>
@@ -226,12 +269,15 @@
 
     <!-- build:js assets/js/app.min.js -->
     <script src="js/chart.js"></script>
+    <script src="js/script-editor.directive.js"></script>
     <script src="js/chartjs-directive.js"></script>
     <script src="js/file-loader.directive.js"></script>
-    <script src="js/thingclient.module.js" ></script>
+    <script src="js/thingclient.module.js"></script>
     <script src="js/thingclient-ctrl.controller.js"></script>
     <!-- endbuild -->
-
+    
+    <script src="node_modules/monaco-editor/min/vs/loader.js"></script>
+    <script src="editor-setup.js"></script>
 </body>
 
 </html>
